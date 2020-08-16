@@ -1,0 +1,28 @@
+---
+title: "The Probability that Mt. Vesuvius will Errupt"
+author: "Craig Slinkman"
+date: "8/15/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This project will try to predict the probability that Mt. Vesuvius will erupt with 20 years based on its Eruptive history.  The project is motivated by a trip to Mt. Vesuvius that my wife and I took in in August 2017. We took the a bus trip up the volcano and they told us that the volcano would erupt within 5 years. 
+
+The logic they used was the the average time between eruptions was longer than the time since the last eruption.  Since the eruption interval tends to be strongly positively skewed for volcanoes I doubted that this was true.  
+
+That is the motivation of this project.
+
+### Vesuvius
+
+[Mt. Vesuvius is a stratovolcano located approximately 6 miles east of the Italian City of Naples.][1]   The volcano is still active and sits on magma chamber of approximately 400 square-kilometer magma chamber.
+
+  
+  
+
+
+## References
+
+[1]: https://en.wikipedia.org/wiki/Mount_Vesuvius
