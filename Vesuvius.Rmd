@@ -17,10 +17,42 @@ That is the motivation of this project.
 
 ### Vesuvius
 
-[Mt. Vesuvius is a stratovolcano located approximately 6 miles east of the Italian City of Naples.][1]   The volcano is still active and sits on magma chamber of approximately 400 square-kilometer magma chamber.
+[Mt. Vesuvius is a stratovolcano located approximately 6 miles east of the Italian City of Naples.][1]   The volcano is still active and sits on magma chamber of 
+approximately 400 square-kilometer magma chamber. 
 
   
-  
+### The data source
+
+The data for this project was found on the [Smithsonian Institution's 'National Museum of Natural Histtory Global Volcanism program](https://volcano.si.edu/).  The data for the dates of the eruption are found [here](https://volcano.si.edu/volcano.cfm?vn=211020). The eruption data is found by clicking the *Eruptive History* tab under the picture and map.
+
+### The data variables
+
+#### Number of observations
+
+We include only data on historical eruptions.  There is an exception to this and that is the eruption in 217 BCE.  We used this because the very next eruption in 79 CE is the famous eruption that destroyed Herculaneum and Pompeii.  There are `r 37-3+1` eruptions over `r 2020 - 79` years.
+
+#### Description of data variables
+
+We describe the data variables below.  The variables appear in the order of the columns of the spreadsheet.  Note that I adopted the tidyverse practice of not including capital letters and using the underscore to separate words.
+
+1. **start_date**
+
+>This is the starting date of the eruption.  Some of these dates are problematic because the actual starting date sometimes did not provide the date components.  Because we are interested in the years between eruptions that is the month was missing date I replaced the missing value for the month with June, that is , the number six. If the fay of the month was missing I replaced the missing day with 15.
+
+2. **sdu**
+>This is the uncertainty about the starting date.  If the starting date known for certain I assigned this variable a zero for no uncertainty; else it has the value of one indicating there is some uncertainty about the starting date.
+
+3. **end_date**
+>This is the end date of the eruption.  Some of these dates are problematic because the actual starting date sometimes did not provide the date components.  Because we are interested in the years between eruptions that is the month was missing date I replaced the missing value for the month with June, that is, the number six. If the fay of the month was missing I replaced the missing day with 15.
+
+4.**edu** 
+>This is the uncertainty about the date that the eruption ended.  If the end_date is known for certain I assigned this variable a zero for no uncertainty; else it has the value of one indicating there is some uncertainty about the end date of the eruption. 
+
+
+
+
+
+
 
 
 ## References
