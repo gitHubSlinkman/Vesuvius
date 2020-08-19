@@ -95,10 +95,12 @@ The name of the file that we need yo read is ##Vesuvius.xlsm##.  The code sank b
 
 ```{r read_vesuvius_data}
 
-fp <- file.path( "data",                    # Construct the file path ...
-                 "vesuvius.xlsm")
 
-eruptions <- read_xlsx( "Vesuvius.xlsx")
+fp <- file.path( getwd(),               # Define file location ...
+                 "data",  
+                 "vesuvius.xlsx" )
+
+eruptions <- read_xlsx( fp )
 ```
 
 
