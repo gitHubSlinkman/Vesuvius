@@ -83,10 +83,19 @@ The data file is stored in the data folder(directory) named data in the R-Projec
 We need to lad some packages to provide functionality that we will need to perform the analysis.  This code is shown in the code chunk below.
 
 ```{r load_packages}
-require(tidyverse)                    # I lice in the tidyverse  ...
-require(readxl)                       # Needed to read the xlsx file  ...
+require(tidyverse)                    # I live in the tidyverse  ...
+require(readr)                        # Needed to read the csv file  ...
 require(lubridate)                    # For consistent handling of dates ...
 require(ggpubr)                       # For publication ready graphs ...
+```
+
+
+### Loading required functions
+
+If you ever find yourself wrtting the same code twice you should extract that code into a function.  This is both more efficient because you need not write duplicated code.  It is also more effective in that you if the are errors in the code those errors will only appear once.
+
+```{r load_functions}
+source("https://raw.githubusercontent.com/gitHubSlinkman/Rsource/master/plot_distribution.R")
 ```
 
 ### Reading the Vesuvius data  
@@ -94,15 +103,69 @@ require(ggpubr)                       # For publication ready graphs ...
 The name of the file that we need yo read is ##Vesuvius.xlsm##.  The code sank below reads the data and stores in the tibble named eruptions.  
 
 ```{r read_vesuvius_data}
+ 
+                 
+fp <- file.path( getwd(),                # Construct the file path ...           
+                 "data",
+                 "Vesuvius.csv" )
 
-fp <- file.path( "data",                    # Construct the file path ...
-                 "vesuvius.xlsm")
+eruptions <- read_csv( fp )              # Read the file ...eruptions
 
-eruptions <- read_xlsx( "Vesuvius.xlsx")
+
 ```
 
 
+### Data vizulization.
 
+Here we draw a density histogram and a smoothed density diagram of the interval 
+between the eruptions.  
+
+#### Selecting the binwidth
+
+R has a nice function called pretty.  It's objective is to select the bandwidth 
+of a histogram and/or density diagram.
+
+```{r select binwidth}
+
+boundaries <- 
+  pretty( eruptions$interval,     # We compute pretty bin boundaries ...                
+          n = 10,                 # Desired number of boundaries ...
+          min.n = 10,             # Minimum number of bins ...
+          high.u.bias = 10,       # We desire wide bins ...
+          eps.correct = 2  )      # Boundaries are to be outside the data ...
+
+boundaries                         # Display bin limits
+
+###############################################################################
+# The ggplot2 geom_histogram requires a binwidth so we subtract the lower 
+# of the first bin from the upper limit of the first.
+###############################################################################
+
+desired_binwidth <- boundaries[2] - boundaries[1]
+desired_binwidth
+```
+
+We are plot the density histogram and smoothed density diagram using the
+function ##plot_distribution##.
+
+```{r plot_distribution}
+interval <-                             # Get intewrvals between eruptions ...
+  eruptions %>% 
+    pull( interval )
+
+interval <- interval[!is.na(interval)]
+
+interval
+
+df <- tibble( interval )
+
+
+ggplot( df, aes( x = interval )) +
+  geom_histogram()
+  
+            
+            
+```
 
 
 

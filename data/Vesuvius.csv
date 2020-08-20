@@ -1,114 +1,38 @@
----
-title: "The Probability that Mt. Vesuvius will Errupt"
-author: "Craig Slinkman"
-date: "8/15/2020"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-This project will try to predict the probability that Mt. Vesuvius will erupt with 20 years based on its Eruptive history.  The project is motivated by a trip to Mt. Vesuvius that my wife and I took in in August 2017. We took the a bus trip up the volcano and they told us that the volcano would erupt within 5 years. 
-
-The logic they used was the the average time between eruptions was longer than the time since the last eruption.  Since the eruption interval tends to be strongly positively skewed for volcanoes I doubted that this was true.  
-
-That is the motivation of this project.
-
-###Hardware and software used
-I am using a HP Laptop 15ef0xxx running Windows 10.  The computer as 12 gigabytes of ram. 
-
-I am using the 64 byte R version 4.02 and RStudio version 1.31.1056 (water-lily).
-
-
-### Vesuvius 
-[I quote Wikipedia below:
-
->Mount Vesuvius is a somma-stratovolcano located on the Gulf of Naples in Campania, Italy, about 9 km (5.6 mi) east of Naples and a short distance from the shore. It is one of several volcanoes which form the Campanian volcanic arc. Vesuvius consists of a large cone partially encircled by the steep rim of a summit caldera caused by the collapse of an earlier and originally much higher structure.
-
->The eruption of Mount Vesuvius in AD 79 destroyed the Roman cities of Pompeii, Herculaneum, Oplontis and Stabiae, as well as several other settlements. The eruption ejected a cloud of stones, ashes and volcanic gases to a height of 33 km (21 mi), erupting molten rock and pulverized pumice at the rate of 6×105 cubic metres (7.8×105 cu yd) per second,[2] ultimately releasing 100,000 times the thermal energy released by the Hiroshima-Nagasaki bombings.[3] More than 1,000 people died in the eruption, but exact numbers are unknown. The only surviving eyewitness account of the event consists of two letters by Pliny the Younger to the historian Tacitus.
-
->Vesuvius has erupted many times since and is the only volcano on the European mainland to have erupted within the last hundred years. Today, it is regarded as one of the most dangerous volcanoes in the world because of the population of 3,000,000 people living near enough to be affected, with 600,000 in the danger zone, making it the most densely populated volcanic region in the world, as well as its tendency towards violent, explosive eruptions of the Plinian type.
-
-### The data source
-
-The data for this project was found on the [Smithsonian Institution's 'National Museum of Natural Histtory Global Volcanism program](https://volcano.si.edu/).  The data for the dates of the eruption are found [here](https://volcano.si.edu/volcano.cfm?vn=211020). The eruption data is found by clicking the *Eruptive History* tab under the picture and map.
-
-### The data variables
-We describe the data variables in the data file below.  The variables appear in the order of the columns of the spreadsheet.  Note that I adopted the tidyverse practice of not including capital letters and using the underscore to separate words.
-
-#### Number of observations
-We include only data on historical eruptions.  There is an exception to this and that is the eruption in 217 BCE.  We used this because the very next eruption in 79 CE is the famous eruption that destroyed Herculaneum and Pompeii.  There are `r 37-3+1` eruptions over `r 2020 - 79` years.
-
-#### start_date
-This is the starting date of the eruption.  Some of these dates are problematic because the actual starting date sometimes did not provide the date components.  Because we are interested in the years between eruptions that is the month was missing date I replaced the missing value for the month with June, that is , the number six. If the fay of the month was missing I replaced the missing day with 15.
-
-#### sdu
-This is the uncertainty about the starting date.  If the starting date known for certain I assigned this variable a zero for no uncertainty; else it has the value of one indicating there is some uncertainty about the starting date.
-
-#### end_date
-This is the end date of the eruption.  Some of these dates are problematic because the actual starting date sometimes did not provide the date components.  Because we are interested in the years between eruptions that is the month was missing date I replaced the missing value for the month with June, that is, the number six. If the fay of the month was missing I replaced the missing day with 15.
-
-#### edu
-This is the uncertainty about the date that the eruption ended.  If the end_date is known for certain I assigned this variable a zero for no uncertainty; else it has the value of one indicating there is some uncertainty about the end date of the eruption. 
-
-#### eruption_certianity
-The variable indicates the degree of certainty about the eruption.  I did not include any of the eruptions where the data about the eruption is uncertain.
-
-#### vei
-The [Volcanic Explosivity Index (VEI)](https://volcanoes.usgs.gov/vsc/glossary/vei.html) is a relative measure of the explosiveness of volcanic eruptions. 
-
-#### evidence
-This is the source of the evidence for this eruption.  All of the eruptions for the time period are based on historical facts.  
-
-#### activity_area
-This is the area of the volcano that was erupting or was effected by the eruption.
-
-#### year
-This is the year of the eruption.  This is extracted from the **start_date** with the exception of the first eruption that occurred in 217 BCE.  Note that it has a 
-negative sign. 
-
-#### interval
-This is the interval between eruptions.  It is computed by subjecting the year of eruption that we are considering minus the year of the eruption eruption.  So if Vesuvius erupts in 2020 and the last prior eruption began in 1913 the interval is $2020-1913 = 117$ years.
-
-#### days
-This is the length of the eruption in days computed from the difference of the start_date
-and end_date when we are confident that tow dates are known.
-
-### Data file
-The data file is stored in the data folder(directory) named data in the R-Project directory named Vesuvius.  Because the data was entered using  (I have to pay for my own software so I used a substitute for Microsoft Office). The data is stored in Microsoft Excel file named ##Vesuvius.xlsx.
-
-### Preparing R for analsys.
-
-We need to lad some packages to provide functionality that we will need to perform the analysis.  This code is shown in the code chunk below.
-
-```{r load_packages}
-require(tidyverse)                    # I lice in the tidyverse  ...
-require(readxl)                       # Needed to read the xlsx file  ...
-require(lubridate)                    # For consistent handling of dates ...
-require(ggpubr)                       # For publication ready graphs ...
-```
-
-### Reading the Vesuvius data  
-
-The name of the file that we need yo read is ##Vesuvius.xlsm##.  The code sank below reads the data and stores in the tibble named eruptions.  
-
-```{r read_vesuvius_data}
-
-
-fp <- file.path( getwd(),               # Define file location ...
-                 "data",  
-                 "vesuvius.xlsx" )
-
-eruptions <- read_xlsx( fp )
-```
-
-
-
-
-
-
-
-## References
-
-[1]: https://en.wikipedia.org/wiki/Mount_Vesuvius
+srart_date,sdu,end_date,edu,eruption_certainity,vei,evidence,avtivity_area,year,interval,days
+,,,,,,,,-217,,
+0079-10-27,0,0079-10-28,0,Confirmed,5,Historical Observations,,79,296,1
+0472-11-05,0,0472-11-06,10,Confirmed,5,Historical Observations,,472,393,
+0505-11-09,1,,1,Uncertain,2,Historical Observations,,505,33,
+0512-07-08,0,,1,Confirmed,4,Historical Observations,,512,7,
+0685-02-15,1,0685-03-15,1,Confirmed,4,Historical Observations,,685,173,28
+0787-10-15,0,0788-01-15,0,Confirmed,3,Historical Observations,Summit and south flank,787,102,
+1006-01-15,1,,0,Confirmed,3,Historical Observations,,1006,219,
+1037-01-27,0,,0,Confirmed,3,Historical Observations,Summit and south flank (I Monticelli?),1037,31,
+1139-06-01,0,1139-06-09,0,Confirmed,3,Historical Observations,,1139,102,8
+1631-12-16,0,01/31/32,1,Confirmed,5,Historical Observations,"Summit, SW and S flanks",1631,492,46
+1637-07-01,0,1652-12-15,1,Confirmed,2,Historical Observations,,1637,6,5646
+1654-02-25,0,1680-03-28,0,Confirmed,3,Historical Observations,,1654,17,9528
+1682-08-12,0,1682-08-22,0,Confirmed,3,Historical Observations,,1682,28,10
+1685-10-03,0,1694-04-29,0,Confirmed,3,Historical Observations,,1685,3,3130
+1696-07-31,0,1696-08-14,0,Confirmed,2,Historical Observations,,1696,11,14
+1697-09-15,0,1698-07-15,0,Confirmed,3,Historical Observations,,1697,1,303
+1701-08-01,0,1707-08-22,0,Confirmed,3,Historical Observations,Summit and SW flank,1701,4,2212
+1708-08-14,0,1723-07-08,0,Confirmed,3,Historical Observations,"Summit, upper east and south flanks",1708,7,5441
+1724-09-04,1,1730-04-01,1,Confirmed,3,Historical Observations,,1724,16,2035
+1732-12-25,0,1737-06-04,0,Confirmed,3,Historical Observations,Summit and SW flank,1732,8,1622
+1742-06-15,0,1743-06-16,0,Confirmed,1,Historical Observations,,1742,10,366
+1744-11-15,0,1761-01-06,0,Confirmed,3,Historical Observations,"Summit, upper SE, E and lower S flanks",1744,2,5896
+1764-06-15,0,1767-10-27,0,Confirmed,3,Historical Observations,"Summit, upper SW, SE, and NNW flanks",1764,20,1229
+1770-02-15,0,1779-10-26,0,Confirmed,3,Historical Observations,"Summit, N, NE, SE and E flanks",1770,6,3540
+1783-08-18,0,1794-07-05,0,Confirmed,3,Historical Observations,Summit and SW flank (550-300 m),1783,13,3974
+1796-01-15,0,1822-11-06,0,Confirmed,3,Historical Observations,Summit and upper flanks,1796,13,9791
+1824-07-02,0,1834-09-02,0,Confirmed,3,Historical Observations,"Summit, upper E and S flanks",1824,28,3714
+1835-01-15,0,1839-01-03,0,Confirmed,3,Historical Observations,"Summit, upper east and west flanks",1835,11,1449
+1841-09-20,0,1850-02-16,0,Confirmed,2,Historical Observations,"Summit, upper N and E flanks",1841,6,3071
+1854-12-14,0,1855-05-27,0,Confirmed,3,Historical Observations,Summit and upper N flank,1854,13,164
+1855-12-19,0,1861-12-31,0,Confirmed,3,Historical Observations,Summit and SW flank (300-225 m),1855,1,2204
+1864-02-10,0,1868-11-26,0,Confirmed,2,Historical Observations,Summit and upper SE flank,1864,9,1751
+1870-12-15,0,1872-04-30,0,Confirmed,3,Historical Observations,Summit and upper NW and south flanks,1870,6,502
+1874-06-15,1,,0,Confirmed,1,,,1874,4,
+1875-12-18,0,1906-04-12,0,Confirmed,4,Historical Observations,Summit and upper flanks,1875,1,11072
+1913-07-05,1,1944-04-04,0,Confirmed,3,Historical Observations,Summit and upper flanks ,1913,38,11231
