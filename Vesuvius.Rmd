@@ -87,6 +87,7 @@ require(tidyverse)                    # I live in the tidyverse  ...
 require(readr)                        # Needed to read the csv file  ...
 require(lubridate)                    # For consistent handling of dates ...
 require(ggpubr)                       # For publication ready graphs ...
+require(cowplot)                      # For more profesional plots ...
 ```
 
 
@@ -149,23 +150,45 @@ We are plot the density histogram and smoothed density diagram using the
 function ##plot_distribution##.
 
 ```{r plot_distribution}
-interval <-                             # Get intewrvals between eruptions ...
-  eruptions %>% 
-    pull( interval )
 
-interval <- interval[!is.na(interval)]
-
-interval
-
-df <- tibble( interval )
-
-
-ggplot( df, aes( x = interval )) +
-  geom_histogram()
-  
-            
-            
+ggplot( eruptions, aes( x = interval, y = ..density..)) +
+  geom_histogram( binwidth = 50,
+                  color="black", 
+                  fill = "green" ) +
+   geom_density( color = "black",
+                  size =1 ) +
+  scale_x_continuous( name = "Years",
+                      breaks = boundaries,
+                      labels = boundaries ) +
+  ylab( "Density function" ) +
+  theme_cowplot()
+ 
 ```
+
+Let's compute the sample of the eruption interval an plot the theoretical probability distribution and the estimated density function on the same plot.
+
+```{r qq_exo exponential_distribution}
+
+ybar <- with( eruptions, mean(interval, 
+                              na.rm=TRUE))
+ybar
+
+y <- seq( from=0, to=500, by=50 )
+density <- dexp(y, rate = 1, log = FALSE)
+
+ggplot( eruptions, aes( x = interval)) +
+  geom_density( color = "green") +
+  stat_function( geom = "line",
+  position = "identity",
+  n = 101,
+  fun = dexp,
+  args = list( rate = 1/ybar),
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE )
+
+```
+
 
 
 
