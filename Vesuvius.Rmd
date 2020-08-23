@@ -186,8 +186,23 @@ ggplot( eruptions, aes( x = interval)) +
   na.rm = FALSE,
   show.legend = NA,
   inherit.aes = TRUE )
+```
+
+
+## Quantile-Quantile Plot for the exponetial distribution  
+
+We start by drawing a qq-plot for the negative exponential distribution using our
+sample.  First we eliminate the first row in our data because is "NA", that is it is missing value.
+
+```{r remove_missing}
+require(car)                               # For qq-plot
+
+no_mv <- eruptions[!is.na(eruptions)]      # no_mv No missing values tibble 
+
 
 ```
+
+
 
 
 
