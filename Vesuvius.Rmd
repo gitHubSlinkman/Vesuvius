@@ -149,7 +149,7 @@ desired_binwidth
 We are plot the density histogram and smoothed density diagram using the
 function ##plot_distribution##.
 
-```{r plot_distribution}
+```{r plot_negative_exponential}
 
 ggplot( eruptions, aes( x = interval, y = ..density..)) +
   geom_histogram( binwidth = 50,
@@ -195,14 +195,94 @@ We start by drawing a qq-plot for the negative exponential distribution using ou
 sample.  First we eliminate the first row in our data because is "NA", that is it is missing value.
 
 ```{r remove_missing}
-require(car)                               # For qq-plot
+require(car)                            # For qq-plot
 
-no_mv <- eruptions[!is.na(eruptions)]      # no_mv No missing values tibble 
+interval <-                             # Remove observations with
+  interval[!is.na(interval)]            # missing values
+interval                                # Display eruption interval.
 
+interval <- sort( interval )
+interval
+
+# qqPlot( interval,
+#         distribution="exp" )
 
 ```
 
 
+It seems quite clear the the negative exponetial distribution does not fit the Vesuvius data.
+So we need to try some other probability distributions with long tails.
+
+
+We will try
+
+* Gamma distribution
+* Weibull distribution
+* Pareto distribution
+* Extreme values distribution
+
+### Estimating the gammad distribution
+
+#### Characterization
+
+When a  random variable $\mathbf{X} is gamma-distributed we write 
+
+$$\mathbf{X} \sim \Gamma(k,\theta)\ \ or \ \mathbf{X} \sim Gamma(k,\theta)$$
+
+#### Probability density function
+
+The probability density function can be expressed in terms of the gamma funcyion 
+
+$$f(x;k,\theta) = x^{k-1}\frac{e^{-x/\theta}}{\theta^k \Gamma(k)} \  \ for\   x > 0,\theta >0$$
+
+Alternatively we can parameterize the gamma distribution distribution can be in terms of the shape parameter $\alpha = k$ and an incerse scale parameter $\beta = 1 / \theta$.
+
+$$f(x;\alpha,\beta) = x^{\alpha-1} \frac{\beta^{\alpha}e^{-\beta x}}{\Gamma(\alpha)} \ for\  x > 0$$
+fitdistrplus** package yet I need to install it.  So instead of using the **library** function I am going to use
+the fenction **require** which returns a boolean return code so I will not need to re-install the package every time I knit this document.  The code chunk is:
+
+```{r install_fitdistrplus}
+if( !require( fitdistrplus )){
+  install.packages( "fitdistrplus" )
+  require( fitdistrplus )
+}
+```
+
+```{r fit_gamma}
+
+descdist( interval, boot = 1000 )
+
+fit.gamma <-  fitdist( interval, "gamma" )
+summary( fit.gamma )
+
+print(fit.gamma)
+
+```
+
+#### PLotting the density function
+
+```{r}
+
+s = coef(fit.gamma)[1]
+r = coef(fit.gamma)[2]
+
+ x2= seq( min(interval), max(interval ))
+ density <- dgamma( x2, shape  = s, rate = r )
+ 
+ df <- tibble( x, density )
+ 
+ 
+ ggplot( df, aes( x = x2, y = density)) +
+   geom_line() +
+   xlab( "Interval between eruptions") +
+   ylab( "Probability density function") +
+   ggtitle( "Vesuvius eruption interval between fits with a Gamma distribution") +
+   theme_cowplot()
+ 
+ 
+```
+
+ 
 
 
 

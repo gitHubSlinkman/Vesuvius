@@ -1,4 +1,4 @@
-srart_date,sdu,end_date,edu,eruption_certainity,vei,evidence,avtivity_area,year,interval,days
+start_date,sdu,end_date,edu,eruption_certainity,vei,evidence,avtivity_area,year,interval,days
 ,,,,,,,,-217,,
 0079-10-27,0,0079-10-28,0,Confirmed,5,Historical Observations,,79,296,1
 0472-11-05,0,0472-11-06,10,Confirmed,5,Historical Observations,,472,393,
